@@ -77,7 +77,7 @@ slash.handle("atividade", (d) => {
   slash.client.rest.api.channels[channel.id].invites
     .post({
       max_age: 604800,
-      max_uses: 0,
+      max_uses: 0,atividade
       target_application_id: atividade.id,
       target_type: 2,
       temporary: false,
