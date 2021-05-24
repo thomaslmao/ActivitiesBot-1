@@ -11,7 +11,7 @@ const ACTIVITIES: {
 } = {
   poker: {
     id: "755827207812677713",
-    name: "Poker Night",
+    name: "Poker",
   },
   betrayal: {
     id: "773336526917861400",
@@ -19,7 +19,7 @@ const ACTIVITIES: {
   },
   youtube: {
     id: "755600276941176913",
-    name: "YouTube Together",
+    name: "YouTuber",
   },
   fishing: {
     id: "814288819477020702",
@@ -27,7 +27,7 @@ const ACTIVITIES: {
   },
   chess: {
     id: "832012586023256104",
-    name: "CG 2 Dev",
+    name: "Xadrez",
   },
 };
 
@@ -36,23 +36,19 @@ slash.commands.all().then((e) => {
   if (e.size !== 2) {
     slash.commands.bulkEdit([
       {
-        name: "invite",
-        description: "Invite me to your server.",
-      },
-      {
-        name: "activity",
-        description: "Start an Activity in a Voice Channel.",
+        name: "atividade",
+        description: "Começa uma Atividade.",
         options: [
           {
-            name: "channel",
+            name: "canal",
             type: slash.SlashCommandOptionType.CHANNEL,
-            description: "Voice Channel to start activity in.",
+            description: "Canal de voz que a atividade começará.",
             required: true,
           },
           {
-            name: "activity",
+            name: "atividade",
             type: slash.SlashCommandOptionType.STRING,
-            description: "Activity to start.",
+            description: "Atividade.",
             required: true,
             choices: Object.entries(ACTIVITIES).map((e) => ({
               name: e[1].name,
@@ -65,11 +61,11 @@ slash.commands.all().then((e) => {
   }
 });
 
-slash.handle("activity", (d) => {
+slash.handle("atividade", (d) => {
   if (!d.guild) return;
-  const channel = d.option<slash.InteractionChannel>("channel");
-  const activity = ACTIVITIES[d.option<string>("activity")];
-  if (!channel || !activity) {
+  const channel = d.option<slash.InteractionChannel>("canal");
+  const atividade = ACTIVITIES[d.option<string>("atividade")];
+  if (!channel || !atividade) {
     return d.reply("Invalid interaction.", { ephemeral: true });
   }
   if (channel.type !== slash.ChannelTypes.GUILD_VOICE) {
@@ -82,31 +78,22 @@ slash.handle("activity", (d) => {
     .post({
       max_age: 604800,
       max_uses: 0,
-      target_application_id: activity.id,
+      target_application_id: atividade.id,
       target_type: 2,
       temporary: false,
     })
     .then((inv) => {
       d.reply(
-        `[Click here to start ${activity.name} in ${channel.name}.](<https://discord.gg/${inv.code}>)`
+        `[Click here to start ${atividade.name} in ${channel.name}.](<https://discord.gg/${inv.code}>)`
       );
     })
     .catch((e) => {
-      console.log("Failed", e);
-      d.reply("Failed to start Activity.", { ephemeral: true });
+      console.log("Erro", e);
+      d.reply("Erro ao começar a atividade.", { ephemeral: true });
     });
 });
 
-slash.handle("invite", (d) => {
-  d.reply(
-    `• [Click here to invite.](<https://discord.com/api/oauth2/authorize?client_id=819835984388030464&permissions=1&scope=applications.commands%20bot>)\n` +
-      `• [Check out Source Code.](<https://github.com/DjDeveloperr/ActivitiesBot>)\n` +
-      `• [Join our Discord.](<https://discord.gg/WVN2JF2FRv>)`,
-    { ephemeral: true }
-  );
-});
-
 // Handle for any other commands received.
-slash.handle("*", (d) => d.reply("Unhandled Command", { ephemeral: true }));
+slash.handle("*", (d) => d.reply("Comando não suportado", { ephemeral: true }));
 // Log all errors.
 slash.client.on("interactionError", console.log);
